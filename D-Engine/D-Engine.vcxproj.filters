@@ -48,4 +48,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Renderer\Shaders\vertexShader.vert" />
+    <None Include="src\Renderer\Shaders\fragmentShader.frag" />
+  </ItemGroup>
 </Project>

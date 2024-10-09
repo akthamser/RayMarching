@@ -1,65 +1,44 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include<iostream>
-#include"Renderer/shader.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
+#include"Renderer/shader.h"
+#include"Renderer/Window.h"
+#include"Renderer/Renderer.h"
 
 
 int main()
 {
-    // Window creation ------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GL_TRUE);
+    Window window = Window(1920, 1080,"D-Engine");
+    Renderer renderer = Renderer(window);
+    glViewport(0, 0, window.Width, window.Height);
 
+    double previousTime = glfwGetTime();
+    int frameCount = 0;
 
-
-    GLFWwindow* window = glfwCreateWindow(800, 600, "PainEngine", NULL, NULL);
-    if (window == NULL)
+    while (!window.ShouldClose())
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
+        double currentTime = glfwGetTime();
+        frameCount++;
 
+        // If a second has passed, calculate the FPS
+        if (currentTime - previousTime >= 1.0) {
+            double fps = double(frameCount) / (currentTime - previousTime);
+            std::cout << "FPS: " << fps << std::endl;
 
-    //--------------------------------
+            // Reset for the next second
+            previousTime = currentTime;
+            frameCount = 0;
+        }
 
-
-    // Glad load opengl functions ------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-    //---------------------------------
-
-
-    // Main Loop --------------------------
-
-    while (!glfwWindowShouldClose(window))
-    {
-        
-
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        renderer.Render();
       
 
 
         glfwPollEvents();
-        glfwSwapBuffers(window);
+        window.SwapBuffers();
 
 
     }
-    //---------------------------------------
+  
 
 
     glfwTerminate();

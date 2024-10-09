@@ -154,6 +154,10 @@
     <ClInclude Include="src\Renderer\Window.h" />
     <ClInclude Include="src\Utils\Utils.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Renderer\Shaders\fragmentShader.frag" />
+    <None Include="src\Renderer\Shaders\vertexShader.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -5,16 +5,17 @@
 class Window {
 
 public :
-	char* Title;
-	static int Width, Height;
+	const char* Title;
+	int Width, Height;
 
-	Window(int width,int height);
+	Window(int width,int height,const char* title);
 	~Window();
 	bool ShouldClose();
 	void SwapBuffers();
+	void MakeContextCurrent();
 
 private:
-	std::unique_ptr<GLFWwindow> m_window;
-
+	GLFWwindow* m_window;
+	static void window_size_call_back(GLFWwindow* window, int width, int height);
 
 };
