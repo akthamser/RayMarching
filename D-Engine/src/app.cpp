@@ -7,7 +7,7 @@
 
 int main()
 {
-    Window window = Window(1920, 1080,"D-Engine");
+    Window window = Window(800, 600,"D-Engine");
     Renderer renderer = Renderer(window);
     glViewport(0, 0, window.Width, window.Height);
 
