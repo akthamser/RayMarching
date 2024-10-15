@@ -16,16 +16,16 @@ float valueNoise(vec3 x){
  vec3 p = floor(x);
  vec3 k = fract(x);
  k=k*k*(3.0-2.0*k);
- float n = p.x + 37.*p.y + 113. *p.z;
+ float n = p.x + 57.*p.y + 113. *p.z;
 
  float a = whiteNoise(n);
  float b = whiteNoise(n + 1);
- float c = whiteNoise(n + 37);
- float d = whiteNoise(n + 38);
+ float c = whiteNoise(n + 57);
+ float d = whiteNoise(n + 58);
  float e = whiteNoise(n + 113);
  float f = whiteNoise(n + 114);
- float g = whiteNoise(n + 150);
- float h = whiteNoise(n + 151);
+ float g = whiteNoise(n + 170);
+ float h = whiteNoise(n + 171);
 
 
  float res = mix( mix(mix(a,b,k.x),mix(c,d,k.x),k.y),
@@ -42,14 +42,14 @@ float fbm(vec3 p) {
     float amplitude = 0.5;  
     float totalAmplitude = 0.0;  
 
-    for (int i = 0; i < 8; i++) {
-        f += amplitude * valueNoise(p);  
-        totalAmplitude += amplitude;     
-        p *= 2.0 + .1 * i ;            
-        amplitude *= 0.5;                
+    for (int i = 0; i < 4; i++) {
+        f += amplitude * valueNoise(p);  // Add current octave's noise contribution
+        totalAmplitude += amplitude;     // Accumulate amplitude for normalization
+        p *= 2.02 + 0.01 * i;            // Increase frequency (slightly different for each octave)
+        amplitude *= 0.5;                // Decrease amplitude for the next octave
     }
 
-    return f totalAmplitude;  // Normalize by the total amplitude
+    return f / totalAmplitude;  // Normalize by the total amplitude
 }
 
 //------------------Util---------------------------------
@@ -256,6 +256,5 @@ void main() {
     vec2 q=gl_FragCoord.xy/u_resolution.xy; 
     
     col*=0.2+0.8*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.7); // vignette
-
     FragColor = vec4(col, 1.0);   
 }
