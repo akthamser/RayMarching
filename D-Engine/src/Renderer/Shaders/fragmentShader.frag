@@ -38,8 +38,9 @@ float valueNoise(vec3 x){
 
 
 float fbm(vec3 p) {
+    p=p*0.4;
     float f = 0.0;
-    float amplitude = 0.5;  
+    float amplitude = 0.8;  
     float totalAmplitude = 0.0;  
 
     for (int i = 0; i < 8; i++) {
@@ -49,7 +50,7 @@ float fbm(vec3 p) {
         amplitude *= 0.5;                
     }
 
-    return f/totalAmplitude;  // Normalize by the total amplitude
+    return f / totalAmplitude;   // Normalize by the total amplitude
 }
 
 //------------------Util---------------------------------
@@ -116,6 +117,11 @@ float sdfFruitShape(vec3 p){
     return length(p) - 1;
 }
 
+float sdfTerrain(vec3 p) {
+    // Apply FBM to control terrain height
+    float height = fbm(p+5*u_time);  // Scaling the XZ plane for smooth terrain
+    return p.y - height;  // Terrain height is determined by FBM
+}
 
 vec2 map(vec3 p){     
     
@@ -129,7 +135,8 @@ vec2 map(vec3 p){
     else
         fruit.y = 2;
 
-    return vec2(min(fruit.x,ground),fruit.y);
+    float terrain = sdfTerrain(p);
+    return vec2(terrain, 2);  // Terrain ID 1
 
     }
 float softShadow(vec3 ro , vec3 rd,float mint,float maxt,float k){
@@ -171,7 +178,7 @@ vec2 intersect(vec3 ro ,vec3 rd){
         
         t += d;
     if(d < .001) return vec2(t,c.y);
-    if(t >  8.) break;
+    if(t >  50.) break;
         
     }
     return vec2(0.0);
@@ -186,9 +193,9 @@ void main() {
     vec3 fcol = vec3(0.8,0.8,1);// bg color
   
 
-    ro.xz *= rot2D(u_time*5);
+    ro.xz *= rot2D(u_time*3);
     rd.yz *= rot2D(0.4);
-    rd.xz *= rot2D(u_time*5);
+    rd.xz *= rot2D(u_time*3);
 
 
     vec2 inter = intersect(ro,rd);
@@ -200,7 +207,7 @@ void main() {
     vec3 nor = Normal(p);
     vec3 sundir = normalize(vec3(1,.8,.6));
     vec3 suncolor = vec3(1.0,0.97 , 0.85);
-    vec3 skycolor = vec3(0.3,0.8,1.2);
+    vec3 skycolor = vec3(0.93,0.8,0.5);
     vec3 bg = exp(uv.y-2.0)*skycolor;
     vec3 bling = normalize(vec3(-sundir.x * 0.8,sundir.y ,-sundir.z * 0.8));
     vec3 ref = reflect(rd, nor);
@@ -235,15 +242,15 @@ void main() {
 
     }
     else if(inter.y == 2){
-        vec3 material = vec3(1,0.0,0.0);
+        vec3 material = vec3(0,0.5,1.0);
 
-        material = mix(material,vec3(0.8,.9,0.2), smoothstep(0.2,1,fbm(p))) ;
+        material = mix(material,vec3(0.0,.7,.8), smoothstep(0.2,1,fbm(p))) ;
         float f = smoothstep(0.0,1.0,fbm(p*4));
         material *= 0.8 + 0.2*  f;
-        material = mix(material , vec3(0.9,0.9,0.7) ,smoothstep(0.7,0.9,fbm(p*48)));
-        float ao; //fake ambient occlusion
-        ao = 0.5 + 0.5 * nor.y;
-        material *= ao;
+      //  material = mix(material , vec3(0.9,0.9,0.7) ,smoothstep(0.7,0.9,fbm(p*48)));
+       // float ao; //fake ambient occlusion
+       // ao = 0.5 + 0.5 * nor.y;
+      //  material *= ao;
         col *= material;
         
     }

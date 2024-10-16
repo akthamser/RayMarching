@@ -58,7 +58,7 @@ void Renderer::Render() {
 
     m_shader->use();
     m_shader->setVec2("u_resolution", glm::vec2(m_window.Width, m_window.Height));
-    m_shader->setFloat("u_time", glfwGetTime() / 10);
+    m_shader->setFloat("u_time", glfwGetTime() / 30);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
