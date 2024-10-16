@@ -49,7 +49,7 @@ float fbm(vec3 p) {
         amplitude *= 0.5;                
     }
 
-    return f totalAmplitude;  // Normalize by the total amplitude
+    return f/totalAmplitude;  // Normalize by the total amplitude
 }
 
 //------------------Util---------------------------------
@@ -255,7 +255,7 @@ void main() {
     }
     vec2 q=gl_FragCoord.xy/u_resolution.xy; 
     
-    col*=0.2+0.8*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.7); // vignette
+    col*=0.2+0.8*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),1); // vignette
 
     FragColor = vec4(col, 1.0);   
 }

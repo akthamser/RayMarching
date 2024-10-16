@@ -8,7 +8,7 @@ public :
 	const char* Title;
 	int Width, Height;
 
-	Window(int width,int height,const char* title);
+	Window(int width,int height,const char* title,bool fullScreen = false);
 	~Window();
 	bool ShouldClose();
 	void SwapBuffers();

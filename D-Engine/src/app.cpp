@@ -3,6 +3,7 @@
 #include"Renderer/shader.h"
 #include"Renderer/Window.h"
 #include"Renderer/Renderer.h"
+#include"ScreenRecorder.h"
 
 
 int main()
@@ -10,6 +11,11 @@ int main()
     Window window = Window(800, 600,"D-Engine");
     Renderer renderer = Renderer(window);
     glViewport(0, 0, window.Width, window.Height);
+
+    bool recorde = false;
+    ScreenRecorder screenRecorder = ScreenRecorder(window.Width, window.Height,144,"Recordings/SecondShader.mp4",false);
+    if (recorde)
+        screenRecorder.StartRecording();
 
     double previousTime = glfwGetTime();
     int frameCount = 0;
@@ -30,8 +36,8 @@ int main()
         }
 
         renderer.Render();
-      
-
+      if(recorde)
+        screenRecorder.captureFrame();
 
         glfwPollEvents();
         window.SwapBuffers();
@@ -39,7 +45,8 @@ int main()
 
     }
   
-
+    
+    
 
     glfwTerminate();
     return 0;

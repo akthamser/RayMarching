@@ -10,7 +10,7 @@ void Window::window_size_call_back(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-Window::Window(int width,int height,const char* title):Width(width),Height(height),Title(title){
+Window::Window(int width,int height,const char* title,bool fullScreen):Width(width),Height(height),Title(title){
 
     glfwInit();
 
@@ -18,9 +18,14 @@ Window::Window(int width,int height,const char* title):Width(width),Height(heigh
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GL_TRUE);
+    
 
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-    m_window = glfwCreateWindow(width, height, title, NULL, NULL);
+    void* fullscreen = fullScreen ? monitor : NULL;
+
+    m_window = glfwCreateWindow(width, height, title, (GLFWmonitor*)fullscreen, NULL);
     if (m_window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
