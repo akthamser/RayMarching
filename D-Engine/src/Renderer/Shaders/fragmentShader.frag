@@ -101,49 +101,40 @@ float opSmoothIntersection( float d1, float d2, float k )
 
 //------------SDFs---------------------------------
 
-float sdfSphere(vec3 p){
-    return length(p) - 1;
+             
 }
-
-float sdfCube(vec3 p , vec3 b){
-    
-    p = abs(p) - b;
-    return length(max(p,0)) + min(max(p.x,max(p.y,p.z)),0);
-}
-float sdfFruitShape(vec3 p){
-
-    float f = pow(dot(p.xz,p.xz),0.25);
-    p.y -= 0.5 * f;
-    return length(p) - 1;
-}
-
-float sdfTerrain(vec3 p) {
-    // Apply FBM to control terrain height
-    float height = fbm(p+5*u_time);  // Scaling the XZ plane for smooth terrain
-    return p.y - height;  // Terrain height is determined by FBM
-}
-
 vec2 map(vec3 p){     
     
-    vec3 fruitpos = vec3(0,0,0); 
-    vec2 fruit = vec2(sdfFruitShape(p-fruitpos),1);
+    float height = 0;
 
-    float ground = p.y + 0.3;
+    float s = 1;
+    float t = 1;
+    float n = 0;
+    float sum = 0;
+    float time = 9;
 
-    if(fruit.x>ground)
-        fruit.y = 1;
-    else
-        fruit.y = 2;
+    for(int k = 0 ; k < 32  ; k++){
 
-    float terrain = sdfTerrain(p);
-    return vec2(terrain, 2);  // Terrain ID 1
+    vec2 dir = vec2(cos(n),sin(n));
+    float x = dot(p.xz,dir)*t + u_time *time;
+    height +=  exp(sin(x)-1) *s;
 
+ 
+    sum += s;
+    s = mix (s,0,0.25);
+    t *= 1.18;
+    
+    n += 1232.399963;
+    time *= 1.07;
     }
+
+    return vec2(p.y - height/sum -2,1);
+}
 float softShadow(vec3 ro , vec3 rd,float mint,float maxt,float k){
 
     float res = 1.0;
     float t = mint;
-    for(int i = 0; i < 256*2 && t < maxt ;i++ )
+    for(int i = 0; i < 256 && t < maxt ;i++ )
     {
         float h = map(ro + rd*t).x;
         if(h < .001) return 0.2;
@@ -156,7 +147,7 @@ float softShadow(vec3 ro , vec3 rd,float mint,float maxt,float k){
 } 
 
 vec3 Normal(vec3 p) {
-    vec3 e = vec3(0.001, 0.0, 0.0);//epsilon
+    vec3 e = vec3(0.1, 0, 0);//epsilon
     vec3 n;
     n.x = map(p + e.xyy).x - map(p - e.xyy).x;
     n.y = map(p + e.yxy).x - map(p - e.yxy).x;
@@ -168,7 +159,7 @@ vec3 Normal(vec3 p) {
 vec2 intersect(vec3 ro ,vec3 rd){
 
     float t = 0;
-    for(int i=0;i<1000;i++){
+    for(int i=0;i<500;i++){
 
         
         vec3 p = ro + rd * t;
@@ -185,84 +176,35 @@ vec2 intersect(vec3 ro ,vec3 rd){
 }
 
 void main() {
-    vec2 uv = (2.0 * gl_FragCoord.xy - u_resolution) / u_resolution.y;
+    vec2 uv = (2 * gl_FragCoord.xy - u_resolution) / u_resolution.y;
 
-    vec3 ro = vec3(0,2,-4);
+    vec3 ro = vec3(0,3,-3);
     vec3 rd = normalize(vec3(uv*0.5,1));
-    vec3 col = vec3(0.8,0.8,1);
-    vec3 fcol = vec3(0.8,0.8,1);// bg color
-  
 
-    ro.xz *= rot2D(u_time*3);
     rd.yz *= rot2D(0.4);
-    rd.xz *= rot2D(u_time*3);
 
+
+    vec3 col = vec3(0.0);
+
+    
 
     vec2 inter = intersect(ro,rd);
 
-    vec3 p = ro + inter.x * rd ;
- 
-    if(inter != vec2(0.0)){
-   
-    vec3 nor = Normal(p);
-    vec3 sundir = normalize(vec3(1,.8,.6));
-    vec3 suncolor = vec3(1.0,0.97 , 0.85);
-    vec3 skycolor = vec3(0.93,0.8,0.5);
-    vec3 bg = exp(uv.y-2.0)*skycolor;
-    vec3 bling = normalize(vec3(-sundir.x * 0.8,sundir.y ,-sundir.z * 0.8));
-    vec3 ref = reflect(rd, nor);
-
-    float con = .7;
-    float sha = softShadow( p, sundir , 0.1 , 1 , 8 );
-    float dif =  max(0,dot(nor,sundir));
-    float bac =  max(0,0.1 + 0.5*dot(nor,bling));
-    float ambient = 0.6 + 0.4 * nor.y;
-    float spe = pow(clamp(dot(sundir, ref), 0.0, 1.0), 8.0);
-    float rim = pow(1+dot(nor,rd),2.5);
-
-    col = con * skycolor;
-    col +=  ambient * skycolor * sha * 0.6;
-    col +=  dif * suncolor * sha  ;
-    col +=  bac * suncolor;
-
-
-    col = col*0.3 + 0.7*sqrt(col);
-    col*=0.5;
-
-
-    if(inter.y == 1 ){
-        vec3 material = vec3(0.6,0.5,0.3) ;
-        float f = fbm(p*vec3(6,0,0.5));
-
-        material = mix(material,vec3(0.3,0.2,.1),f);
-        float ao = smoothstep(0.1,1.5,length(p.xz));
-
-        material *= ao;
-        col *= material;
-
-    }
-    else if(inter.y == 2){
-        vec3 material = vec3(0,0.5,1.0);
-
-        material = mix(material,vec3(0.0,.7,.8), smoothstep(0.2,1,fbm(p))) ;
-        float f = smoothstep(0.0,1.0,fbm(p*4));
-        material *= 0.8 + 0.2*  f;
-      //  material = mix(material , vec3(0.9,0.9,0.7) ,smoothstep(0.7,0.9,fbm(p*48)));
-       // float ao; //fake ambient occlusion
-       // ao = 0.5 + 0.5 * nor.y;
-      //  material *= ao;
-        col *= material;
-        
-    }
-    col += 0.3 * rim * ambient;
-    col += 0.6 * spe * sha *ambient;
-
-    col = col*0.1 + 0.9*sqrt(col);
-    col *= vec3(0.9,0.8,0.7);
-    }
-    vec2 q=gl_FragCoord.xy/u_resolution.xy; 
     
-    col*=0.2+0.8*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),1); // vignette
+
+    if(inter != vec2(0.0)){
+    
+    vec3 p = ro + inter.x * rd;
+    vec3 nor = Normal(p);
+    vec3 lightdir = normalize(vec3(sin(u_time),1,cos(u_time)));
+
+    float diff = max(0,dot(lightdir,nor));
+    float sha = softShadow( p, lightdir , .1 , 10 , 0.5);
+    col = inter.y == 1 ? vec3(0,0,1) : vec3(0,1,0);
+    
+    col *= diff + 0.1;
+    }
+  
 
     FragColor = vec4(col, 1.0);   
 }

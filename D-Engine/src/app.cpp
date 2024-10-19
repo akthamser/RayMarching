@@ -8,12 +8,12 @@
 
 int main()
 {
-    Window window = Window(1920, 1080,"D-Engine",true);
+    Window window = Window(800, 600,"D-Engine",false);
     Renderer renderer = Renderer(window);
     glViewport(0, 0, window.Width, window.Height);
 
-    bool recorde = true;
-    ScreenRecorder screenRecorder = ScreenRecorder(window.Width, window.Height,60,"Recordings/firstTryWater.mp4",true);
+    bool recorde = false;
+    ScreenRecorder screenRecorder = ScreenRecorder(window.Width, window.Height,60,"Recordings/firstTryWater.mp4",false);
     if (recorde)
         screenRecorder.StartRecording();
 
