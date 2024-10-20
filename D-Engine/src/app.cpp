@@ -6,14 +6,13 @@
 #include"ScreenRecorder.h"
 
 
-int main()
-{
-    Window window = Window(800, 600,"D-Engine",false);
+int main(){
+    Window window = Window(1920, 1080,"D-Engine",true);
     Renderer renderer = Renderer(window);
     glViewport(0, 0, window.Width, window.Height);
 
-    bool recorde = false;
-    ScreenRecorder screenRecorder = ScreenRecorder(window.Width, window.Height,60,"Recordings/firstTryWater.mp4",false);
+    bool recorde = true;
+    ScreenRecorder screenRecorder = ScreenRecorder(window.Width, window.Height,60,"Recordings/WaterEndResultDay2.mp4",false);
     if (recorde)
         screenRecorder.StartRecording();
 
