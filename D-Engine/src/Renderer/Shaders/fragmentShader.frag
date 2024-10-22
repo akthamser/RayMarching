@@ -3,6 +3,8 @@
 uniform vec2 u_resolution;
 uniform float u_time;
 
+uniform samplerCube skybox; // 0
+
 out vec4 FragColor;
 
 float pixel_size; 
@@ -33,15 +35,15 @@ vec4 map(vec3 p){
     
     float height = 0;
 
-    float amp = 1;
-    float freq = 1;
+    float amp = 10;
+    float freq = .1;
     float n = 0;
     float ampSum = 0;
     float time = 8;
     float ddx = 0;  
     float ddy = 0;
 
-    for(int k = 0 ; k < 32  ; k++){
+    for(int k = 0 ; k < 64  ; k++){
 
         vec2 dir = vec2(cos(n),sin(n));
         
@@ -56,7 +58,7 @@ vec4 map(vec3 p){
 
         ampSum += amp;
         amp *= 0.82;
-        freq *= 1.18;
+        freq *= 1.15;
     
         n += 13298.693;
         time *= 1.07;
@@ -113,20 +115,34 @@ void main() {
     vec3 ro = vec3(0,2,-3);
     vec3 rd = normalize(vec3(uv*0.5,1));
 
-    //rd.yz *= rot2D(0.4 + u_time*0);
+    //rd.yz *= rot2D(0.2*u_time);
 
 
     vec3 col = vec3(0.0);
 
     
 
+
     vec4 inter = intersect(ro,rd);
     vec3 p = ro + inter.x * rd;
     vec3 nor = Normal2(inter);
     vec3 ref = normalize(reflect(rd,nor));
-    vec3 lightdir = normalize(vec3(0,sin(u_time*0.3)*0.4,1));
+    vec3 lightdir = normalize(vec3(0,0.4,1));
 
+    vec3 skyboxCoord = rd;
+    vec3 skyboxreflect = ref;
+
+    skyboxCoord.yz *= rot2D(-0.07);
+    skyboxreflect.yz *= rot2D(-0.07); 
     
+    skyboxCoord.xz *= rot2D(u_time*0.1);
+    skyboxreflect.xz *= rot2D(u_time*0.1);
+
+
+
+
+    vec3 skyboxcol = texture(skybox,normalize(skyboxCoord)).xyz;
+    vec3 skyboxreflectcol = texture(skybox,normalize(skyboxreflect)).xyz;
 
     if(inter.y != -1){
 
@@ -145,35 +161,33 @@ void main() {
 
 
 
-    col = (ambient + diffuse ) *baseColor;
-
-    col = pow(col,vec3(1/1.8));
+    col = (ambient + diffuse ) * baseColor;
 
     //Speculer
-    float speculerStrength =  pow(max(0,dot(ref,lightdir)),64);
-    vec3 speculer = speculerStrength * vec3(1.5,1.5,1.5);    
+    float speculerStrength =  pow(max(0,dot(ref,lightdir)),32);
+    vec3 speculer = speculerStrength * vec3(1,.7,.2) *3;    
    
     //Fresnel Effect
-    float fresnel = pow(1.0 - max(dot(-rd, nor), 0.0), 5.0);
+    float fresnel = 0.1 + 0.9*pow(1.0 - max(dot(-rd, nor), 0.0), 5.0);
 
     col+= speculer * fresnel;
 
-    vec3 fresnelEffect = mix(col, vec3(.9, .9, 1.0), fresnel);  // Blend with light blue for a reflective effect
-    col = fresnelEffect;
-
+    vec3 refcol = skyboxreflectcol;
+    col += refcol * fresnel ;
+    
 
     // Fog
-    float b = 0.05;
-    float fogAmount = 1.0 - exp(-inter.x*b);
-    col = mix(col,vec3(.8,.8,.9),fogAmount);
+    float fogAmount = inter.x/50;
+    col = mix(col,skyboxcol,fogAmount);
    
-    // 
+    
 
 
 
     }
     else{
 
+      
       float height = rd.y;
       vec3 skyTop = vec3(0.5, 0.6, 0.8);
       vec3 skyBottom = vec3(0.8, 0.8, 0.9);
@@ -181,12 +195,16 @@ void main() {
       vec3 skyColor = mix(skyBottom, skyTop, p.y / maxSkyHeight);
 
       float sun = max(0,dot(rd,lightdir));
-      vec3 sunColor = smoothstep(0.998,0.9998,max(0,dot(rd,lightdir))) *  vec3(1,.9,.7) ;
+      vec3 sunColor = smoothstep(0.8,1.5,max(0,dot(rd,lightdir))) *  mix(vec3(1,.7,.2),skyboxcol,0) ;
+      vec3 sunColor1 = smoothstep(0.995,1,max(0,dot(rd,lightdir))) *  mix(vec3(1,.7,.2),skyboxcol,0) ;
       col = skyColor + sunColor;
+      
+
+      col = skyboxcol + sunColor1 + sunColor;
 
     }
 
-   
+
 
     vec2 q=gl_FragCoord.xy/u_resolution.xy; 
 

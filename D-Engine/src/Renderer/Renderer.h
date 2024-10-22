@@ -4,7 +4,9 @@
 #include<iostream>
 #include"shader.h"
 #include"Window.h"
-
+#include<vector>
+#include<string>
+#include"../Dependencies/stb_image.h"
 
 class Renderer {
 
@@ -18,6 +20,7 @@ private:
 	Shader* m_shader;
 	unsigned int VAO, VBO, EBO;
 	Window& m_window;
+	unsigned int cubemapID;
 
 	
 };
