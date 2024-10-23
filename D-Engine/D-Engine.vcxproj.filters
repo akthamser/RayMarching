@@ -62,7 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Renderer\Shaders\vertexShader.vert" />
-    <None Include="src\Renderer\Shaders\fragmentShader.frag" />
     <None Include="src\Renderer\Shaders\fruit.frag" />
   </ItemGroup>
   <ItemGroup>

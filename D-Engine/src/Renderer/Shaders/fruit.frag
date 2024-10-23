@@ -132,6 +132,7 @@ vec2 map(vec3 p){
     return vec2(min(fruit.x,ground),fruit.y);
 
     }
+
 float softShadow(vec3 ro , vec3 rd,float mint,float maxt,float k){
 
     float res = 1.0;
@@ -161,7 +162,7 @@ vec3 Normal(vec3 p) {
 vec2 intersect(vec3 ro ,vec3 rd){
 
     float t = 0;
-    for(int i=0;i<1000;i++){
+    for(int i=0;i<200;i++){
 
         
         vec3 p = ro + rd * t;

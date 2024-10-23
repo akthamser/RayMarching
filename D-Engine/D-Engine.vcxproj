@@ -159,7 +159,6 @@
     <ClInclude Include="src\Utils\Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\Renderer\Shaders\fragmentShader.frag" />
     <None Include="src\Renderer\Shaders\fruit.frag" />
     <None Include="src\Renderer\Shaders\vertexShader.vert" />
   </ItemGroup>

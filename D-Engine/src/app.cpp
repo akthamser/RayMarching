@@ -11,8 +11,8 @@ int main(){
     Renderer renderer = Renderer(window);
     glViewport(0, 0, window.Width, window.Height);
 
-    bool recorde = true;
-    ScreenRecorder screenRecorder = ScreenRecorder(window.Width, window.Height,60,"Recordings/WaterEndResultDay2.mp4",false);
+    bool recorde = false;
+    ScreenRecorder screenRecorder = ScreenRecorder(window.Width, window.Height,60,"Recordings/FruitScene.mp4",false);
     if (recorde)
         screenRecorder.StartRecording();
 
@@ -24,12 +24,10 @@ int main(){
         double currentTime = glfwGetTime();
         frameCount++;
 
-        // If a second has passed, calculate the FPS
         if (currentTime - previousTime >= 1.0) {
             double fps = double(frameCount) / (currentTime - previousTime);
             std::cout << "FPS: " << fps << std::endl;
 
-            // Reset for the next second
             previousTime = currentTime;
             frameCount = 0;
         }

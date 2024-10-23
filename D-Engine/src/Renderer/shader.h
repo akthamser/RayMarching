@@ -1,17 +1,17 @@
 #pragma once
-#include <glad/glad.h> // include glad to get all the required OpenGL headers
+#include <glad/glad.h> 
 
 #include"../Utils/Utils.h"
 
 
-constexpr const char* SHADER_PATH = "Z:/DEV/RayMarching/D-Engine/src/Renderer/Shaders/";
+constexpr const char* SHADER_PATH = "./src/Renderer/Shaders/";
 
 class Shader
 {
 public:
     unsigned int ID;
 
-    // Remove Default Constractor
+
     Shader() = delete;
 
     Shader(const char* vertexFile, const char* fragmentFile);

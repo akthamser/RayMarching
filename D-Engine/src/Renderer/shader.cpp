@@ -3,8 +3,8 @@
 
 
 void checkCompileErrors(unsigned int shader, std::string type);
-// constructor generates the shader on the fly
-// ------------------------------------------------------------------------
+
+
 Shader::Shader(const char* vertexFile, const char* fragmentFile)
 {
 
@@ -84,8 +84,7 @@ void Shader::setVec4(const std::string& name, float x, float y, float z, float w
 
 
 
-// utility function for checking shader compilation/linking errors.
-// ------------------------------------------------------------------------
+
 void checkCompileErrors(unsigned int shader, std::string type)
 {
     int success;
