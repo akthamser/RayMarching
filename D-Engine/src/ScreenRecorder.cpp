@@ -9,6 +9,7 @@ ScreenRecorder::ScreenRecorder(int width, int height, int frames, const std::str
 	if (result != 0)
 	{
 		std::cout << "ffmpeg not installed properly , make sure its added to your PATH envirment variables" << std::endl;
+		return;
 	}
 	std::string override = overRide ? "-y" : "-n";
 	commande = "ffmpeg "+ override +" -f rawvideo -pix_fmt bgr24 -s "
@@ -49,6 +50,6 @@ void ScreenRecorder::captureFrame() {
 
 	size_t written = fwrite(reinterpret_cast<const char*>(pixels.data()), sizeof(unsigned char), pixels.size(), ffmpegPipe);
 	if (written != pixels.size()) {
-		//std::cerr << "Error writing to FFmpeg pipe!" + std::to_string(written) << std::endl;
+		std::cerr << "Error writing to FFmpeg pipe!" + std::to_string(written) << std::endl;
 	}
 }
